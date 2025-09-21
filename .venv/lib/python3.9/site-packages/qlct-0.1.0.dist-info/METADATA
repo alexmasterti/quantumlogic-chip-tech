@@ -15,31 +15,58 @@ Requires-Dist: pandas
 Requires-Dist: requests
 Requires-Dist: httpx
 
-# QuantumLogic Chip Technology v3
+# 🚀 QuantumLogic Chip Technology (QLCT)
 
-Research prototype for the NIW endeavor by Alex Costa Souza. 
-This version includes quantum algorithms (Grover + Amplitude Estimation), FastAPI service, Streamlit UI, Docker containerization, and automated CI/CD.
+**Production-Ready Quantum Computing & Post-Quantum Cryptography Platform**  
+*Research prototype for NIW endeavor by Alex Costa Souza*
 
-## 🚀 Quick Start with Docker (Recommended)
+This platform demonstrates advanced quantum algorithms, enterprise-grade software architecture, and production-ready deployment capabilities.
 
-The fastest way to run the complete system:
+## 📁 **Project Structure**
 
-```bash
-# Build and run both API and Streamlit UI
-docker compose up --build
-
-# Run in background  
-docker compose up -d --build
+```
+quantumlogic-chip-tech/
+├── 📊 presentations/          # Presentation materials & pitch decks
+├── 📚 documentation/          # Technical documentation & guides  
+├── 🎮 demos/                  # Demo scripts & examples
+├── 🐳 deployment/             # Docker & deployment configuration
+├── 📦 src/qlct/               # Core quantum algorithms & services
+├── 🧪 tests/                  # Test suite
+├── 📁 static/                 # Assets & logo files
+├── 🗂️ temp/                   # Temporary files
+├── app.py                     # Main Streamlit application
+├── requirements.txt           # Python dependencies
+└── pyproject.toml            # Project configuration
 ```
 
-Then open:
-- **Streamlit UI**: http://localhost:8501
-- **FastAPI API**: http://localhost:8000/docs
-- **API Endpoints**: http://localhost:8000
+## 🚀 **Quick Start**
 
-## 🛠️ Local Development Setup
+### **One-Command Deployment**
+```bash
+# Navigate to deployment folder
+cd deployment
+
+# Start the complete platform
+docker compose up --build
+
+# Or use the automated script
+./start.sh --docker
+```
+
+### **Access Points**
+- **🌐 Landing Page:** http://localhost:8000
+- **📊 Interactive Dashboard:** http://localhost:8503
+- **📖 API Documentation:** http://localhost:8000/docs
+- **❤️ Health Check:** http://localhost:8000/health
+
+## 🛠️ **Local Development Setup**
 
 ```bash
+# Option 1: Automated startup script (RECOMMENDED)
+cd deployment
+./start.sh
+
+# Option 2: Manual setup
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -54,6 +81,24 @@ uvicorn qlct.pipeline.fastapi_app:app --reload
 # Start Streamlit UI (in another terminal)
 streamlit run app.py
 ```
+
+## 🔧 Smart Configuration
+
+The platform now includes intelligent configuration:
+
+- **Auto-detection**: Automatically finds available API servers
+- **Environment support**: Set `QLCT_API_URL` to override defaults
+- **Port conflict resolution**: Automatically finds available ports
+- **Connection testing**: Real-time API health verification
+- **Troubleshooting**: Built-in diagnostics and error resolution
+
+## 📂 **Quick Navigation**
+
+- **📊 [Presentations](./presentations/)** - Ready-to-use pitch decks and demo materials
+- **📚 [Documentation](./documentation/)** - Technical guides and enhancement summaries  
+- **🎮 [Demos](./demos/)** - Interactive demo scripts and examples
+- **🐳 [Deployment](./deployment/)** - Docker containers and deployment scripts
+- **📁 [Static Assets](./static/)** - Logo and visual assets
 
 ## 🧪 API Testing
 
@@ -103,17 +148,23 @@ This project demonstrates advanced software engineering capabilities in quantum 
 
 ```
 quantumlogic-chip-tech/
-├── src/qlct/                  # Core quantum logic package
+├── 📊 presentations/          # Presentation materials & pitch decks
+├── 📚 documentation/          # Technical documentation & guides  
+├── 🎮 demos/                  # Demo scripts & examples
+├── 🐳 deployment/             # Docker & deployment configuration
+├── 📦 src/qlct/               # Core quantum algorithms & services
 │   ├── algorithms/            # Quantum algorithms (Grover, AmpEst)
 │   ├── crypto/               # Post-quantum cryptography
-│   └── pipeline/             # FastAPI service & pipeline
-├── tests/                    # Comprehensive test suite  
-├── docs/                     # Technical documentation
+│   ├── pipeline/             # FastAPI service & middleware
+│   ├── database/             # Data models
+│   └── monitoring/           # Dashboard & analytics
+├── 🧪 tests/                  # Comprehensive test suite
+├── 📁 docs/                   # Original documentation
+├── 📁 static/                 # Assets & logo files
+├── 🗂️ temp/                   # Temporary files
 ├── .github/workflows/        # CI/CD automation
-├── Dockerfile.api            # API container
-├── Dockerfile.streamlit      # UI container  
-├── docker-compose.yml        # Multi-service deployment
-└── app.py                    # Streamlit demo application
+├── app.py                    # Main Streamlit application
+└── requirements.txt          # Python dependencies
 ```
 
 ## 🔄 CI/CD Pipeline
@@ -123,4 +174,4 @@ quantumlogic-chip-tech/
 - **Quality Assurance**: Linting, testing, and API integration checks
 - **Documentation**: Auto-generated API docs and technical specifications
 
-See [README_DOCKER_CI.md](README_DOCKER_CI.md) for detailed deployment instructions.
+See [documentation/README_DOCKER_CI.md](./documentation/README_DOCKER_CI.md) for detailed deployment instructions.
