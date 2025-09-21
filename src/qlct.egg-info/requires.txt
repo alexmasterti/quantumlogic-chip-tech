@@ -3,3 +3,8 @@ numpy
 fastapi
 uvicorn
 cryptography
+streamlit
+plotly
+pandas
+requests
+httpx

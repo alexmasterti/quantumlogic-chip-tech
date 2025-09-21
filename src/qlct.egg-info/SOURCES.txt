@@ -13,8 +13,13 @@ src/qlct/algorithms/sim_circuit.py
 src/qlct/crypto/__init__.py
 src/qlct/crypto/pqc_adapter.py
 src/qlct/crypto/symmetric.py
+src/qlct/database/__init__.py
+src/qlct/database/models.py
+src/qlct/monitoring/__init__.py
+src/qlct/monitoring/dashboard.py
 src/qlct/pipeline/__init__.py
 src/qlct/pipeline/fastapi_app.py
+src/qlct/pipeline/middleware.py
 src/qlct/pipeline/pipeline_demo.py
 src/qlct/pipeline/service.py
 tests/test_all.py

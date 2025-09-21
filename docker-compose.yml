@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: qlct_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src:ro
+      - ./app.py:/app/app.py:ro
+      - ./requirements.txt:/app/requirements.txt:ro
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: qlct_ui
+    ports:
+      - "8501:8501"
+    environment:
+      - QLCT_API_BASE=http://api:8000
+    depends_on:
+      - api
+    volumes:
+      - ./app.py:/app/app.py:ro
+      - ./requirements.txt:/app/requirements.txt:ro
