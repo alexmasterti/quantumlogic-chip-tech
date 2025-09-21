@@ -1,28 +1,38 @@
-version: "3.9"
+version: '3.8'
+
 services:
-  api:
+  qlct-api:
     build:
-      context: .
-      dockerfile: Dockerfile.api
-    container_name: qlct_api
+      context: ..
+      dockerfile: deployment/Dockerfile.api
     ports:
       - "8000:8000"
-    volumes:
-      - ./src:/app/src:ro
-      - ./app.py:/app/app.py:ro
-      - ./requirements.txt:/app/requirements.txt:ro
-
-  ui:
-    build:
-      context: .
-      dockerfile: Dockerfile.streamlit
-    container_name: qlct_ui
-    ports:
-      - "8501:8501"
     environment:
-      - QLCT_API_BASE=http://api:8000
+      - PYTHONPATH=/app/src
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - qlct-network
+
+  qlct-ui:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile.streamlit
+    ports:
+      - "8503:8503"
+    environment:
+      - QLCT_API_URL=http://qlct-api:8000
+      - PYTHONPATH=/app/src
     depends_on:
-      - api
-    volumes:
-      - ./app.py:/app/app.py:ro
-      - ./requirements.txt:/app/requirements.txt:ro
+      qlct-api:
+        condition: service_healthy
+    networks:
+      - qlct-network
+
+networks:
+  qlct-network:
+    driver: bridge

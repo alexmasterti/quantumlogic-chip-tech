@@ -75,6 +75,14 @@ The platform now includes intelligent configuration:
 - **Connection testing**: Real-time API health verification
 - **Troubleshooting**: Built-in diagnostics and error resolution
 
+## 📂 **Quick Navigation**
+
+- **📊 [Presentations](./presentations/)** - Ready-to-use pitch decks and demo materials
+- **📚 [Documentation](./documentation/)** - Technical guides and enhancement summaries  
+- **🎮 [Demos](./demos/)** - Interactive demo scripts and examples
+- **🐳 [Deployment](./deployment/)** - Docker containers and deployment scripts
+- **📁 [Static Assets](./static/)** - Logo and visual assets
+
 ## 🧪 API Testing
 
 ```bash
@@ -123,17 +131,23 @@ This project demonstrates advanced software engineering capabilities in quantum 
 
 ```
 quantumlogic-chip-tech/
-├── src/qlct/                  # Core quantum logic package
+├── 📊 presentations/          # Presentation materials & pitch decks
+├── 📚 documentation/          # Technical documentation & guides  
+├── 🎮 demos/                  # Demo scripts & examples
+├── 🐳 deployment/             # Docker & deployment configuration
+├── 📦 src/qlct/               # Core quantum algorithms & services
 │   ├── algorithms/            # Quantum algorithms (Grover, AmpEst)
 │   ├── crypto/               # Post-quantum cryptography
-│   └── pipeline/             # FastAPI service & pipeline
-├── tests/                    # Comprehensive test suite  
-├── docs/                     # Technical documentation
+│   ├── pipeline/             # FastAPI service & middleware
+│   ├── database/             # Data models
+│   └── monitoring/           # Dashboard & analytics
+├── 🧪 tests/                  # Comprehensive test suite
+├── 📁 docs/                   # Original documentation
+├── 📁 static/                 # Assets & logo files
+├── 🗂️ temp/                   # Temporary files
 ├── .github/workflows/        # CI/CD automation
-├── Dockerfile.api            # API container
-├── Dockerfile.streamlit      # UI container  
-├── docker-compose.yml        # Multi-service deployment
-└── app.py                    # Streamlit demo application
+├── app.py                    # Main Streamlit application
+└── requirements.txt          # Python dependencies
 ```
 
 ## 🔄 CI/CD Pipeline
@@ -143,4 +157,4 @@ quantumlogic-chip-tech/
 - **Quality Assurance**: Linting, testing, and API integration checks
 - **Documentation**: Auto-generated API docs and technical specifications
 
-See [README_DOCKER_CI.md](README_DOCKER_CI.md) for detailed deployment instructions.
+See [documentation/README_DOCKER_CI.md](./documentation/README_DOCKER_CI.md) for detailed deployment instructions.

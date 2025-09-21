@@ -1,177 +1,244 @@
 #!/bin/bash
 
-# 🚀 QuantumLogic Chip Technology Startup Script
-# Automated setup for visual demonstrations
+# QuantumLogic Chip Technology Startup Script
+# Production-ready deployment automation
 
-set -e  # Exit on any error
+set -e
 
-echo "🚀 Starting QuantumLogic Chip Technology Platform..."
-echo "======================================================="
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-# Check if we're in the right directory
-if [ ! -f "app.py" ] || [ ! -f "docker-compose.yml" ]; then
-    echo "❌ Error: Please run this script from the quantumlogic-chip-tech directory"
-    exit 1
-fi
+# Configuration
+DEFAULT_API_PORT=8000
+DEFAULT_UI_PORT=8503
+VENV_PATH="../.venv"
 
-# Function to check if port is available
-check_port() {
-    local port=$1
-    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
-        return 1  # Port is in use
-    else
-        return 0  # Port is available
-    fi
+# Functions
+print_header() {
+    echo -e "${BLUE}"
+    echo "🚀 QuantumLogic Chip Technology (QLCT) Startup"
+    echo "Production-Ready Quantum Computing Platform"
+    echo -e "${NC}"
 }
 
-# Function to find available port
-find_available_port() {
-    local base_port=$1
-    local port=$base_port
-    while ! check_port $port; do
-        echo "⚠️  Port $port is in use, trying $((port + 1))..."
-        port=$((port + 1))
-        if [ $port -gt $((base_port + 10)) ]; then
-            echo "❌ Could not find available port after $base_port"
-            exit 1
-        fi
-    done
-    echo $port
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
 }
 
-# Check startup method preference
-if [ "$1" = "--docker" ] || [ "$1" = "-d" ]; then
-    echo "🐳 Starting with Docker..."
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+check_dependencies() {
+    echo "🔍 Checking dependencies..."
     
-    # Check if Docker is running
-    if ! docker info >/dev/null 2>&1; then
-        echo "❌ Docker is not running. Please start Docker first."
+    if ! command -v python3 &> /dev/null; then
+        print_error "Python 3 is required but not installed"
         exit 1
     fi
     
-    # Stop any existing containers
-    echo "🧹 Cleaning up existing containers..."
-    docker compose down >/dev/null 2>&1 || true
-    
-    # Build and start
-    echo "🔨 Building and starting services..."
-    docker compose up --build -d
-    
-    # Wait for services to be ready
-    echo "⏳ Waiting for services to start..."
-    sleep 5
-    
-    # Check API health
-    for i in {1..30}; do
-        if curl -s http://localhost:8000/health >/dev/null 2>&1; then
-            echo "✅ API server is ready!"
-            break
-        fi
-        if [ $i -eq 30 ]; then
-            echo "❌ API server failed to start within 30 seconds"
-            docker compose logs api
-            exit 1
-        fi
-        sleep 1
-    done
-    
-    # Check Streamlit
-    for i in {1..30}; do
-        if curl -s http://localhost:8501 >/dev/null 2>&1; then
-            echo "✅ Streamlit dashboard is ready!"
-            break
-        fi
-        if [ $i -eq 30 ]; then
-            echo "❌ Streamlit failed to start within 30 seconds"
-            docker compose logs ui
-            exit 1
-        fi
-        sleep 1
-    done
-    
-    echo ""
-    echo "🎉 SUCCESS! QuantumLogic Platform is running!"
-    echo "======================================================="
-    echo "📊 Streamlit Dashboard: http://localhost:8501"
-    echo "🚀 FastAPI Documentation: http://localhost:8000/docs"
-    echo "🏥 API Health Check: http://localhost:8000/health"
-    echo ""
-    echo "💡 To stop services: docker compose down"
-    echo "📋 To view logs: docker compose logs -f"
-    
-else
-    echo "🔧 Starting with local Python environment..."
-    
-    # Check if virtual environment exists
-    if [ ! -d ".venv" ]; then
-        echo "📦 Creating virtual environment..."
-        python3 -m venv .venv
+    if ! command -v pip &> /dev/null; then
+        print_error "pip is required but not installed"
+        exit 1
     fi
     
-    # Activate virtual environment
-    echo "🔌 Activating virtual environment..."
-    source .venv/bin/activate
+    print_success "Dependencies check passed"
+}
+
+setup_venv() {
+    echo "🐍 Setting up Python virtual environment..."
     
-    # Install dependencies
-    echo "📚 Installing dependencies..."
-    pip install -q --upgrade pip
-    pip install -q -r requirements.txt
-    pip install -q -e .
+    if [ ! -d "$VENV_PATH" ]; then
+        python3 -m venv "$VENV_PATH"
+        print_success "Virtual environment created"
+    else
+        print_success "Virtual environment already exists"
+    fi
     
-    # Find available ports
-    API_PORT=$(find_available_port 8000)
-    STREAMLIT_PORT=$(find_available_port 8501)
+    source "$VENV_PATH/bin/activate"
+    pip install --upgrade pip
+    pip install -r ../requirements.txt
+    pip install -e ..
     
-    echo "🌐 Using ports - API: $API_PORT, Streamlit: $STREAMLIT_PORT"
+    print_success "Virtual environment configured"
+}
+
+check_ports() {
+    local api_port=$1
+    local ui_port=$2
     
-    # Set environment variable for API URL
-    export QLCT_API_URL="http://127.0.0.1:$API_PORT"
+    if lsof -Pi :$api_port -sTCP:LISTEN -t >/dev/null ; then
+        print_warning "Port $api_port is already in use"
+        return 1
+    fi
     
-    # Start API server in background
-    echo "🚀 Starting FastAPI server on port $API_PORT..."
-    uvicorn qlct.pipeline.fastapi_app:app --reload --host 127.0.0.1 --port $API_PORT > api.log 2>&1 &
+    if lsof -Pi :$ui_port -sTCP:LISTEN -t >/dev/null ; then
+        print_warning "Port $ui_port is already in use" 
+        return 1
+    fi
+    
+    return 0
+}
+
+start_api() {
+    echo "🔌 Starting FastAPI backend..."
+    cd ..
+    source "$VENV_PATH/bin/activate"
+    uvicorn qlct.pipeline.fastapi_app:app --reload --host 0.0.0.0 --port $DEFAULT_API_PORT &
     API_PID=$!
+    cd deployment
+    sleep 5
     
-    # Wait for API to be ready
-    echo "⏳ Waiting for API server..."
-    for i in {1..30}; do
-        if curl -s http://127.0.0.1:$API_PORT/health >/dev/null 2>&1; then
-            echo "✅ API server is ready!"
-            break
-        fi
-        if [ $i -eq 30 ]; then
-            echo "❌ API server failed to start"
-            cat api.log
-            kill $API_PID 2>/dev/null || true
-            exit 1
-        fi
-        sleep 1
-    done
+    if kill -0 $API_PID 2>/dev/null; then
+        print_success "FastAPI backend started (PID: $API_PID)"
+        return 0
+    else
+        print_error "Failed to start FastAPI backend"
+        return 1
+    fi
+}
+
+start_ui() {
+    echo "📊 Starting Streamlit UI..."
+    cd ..
+    source "$VENV_PATH/bin/activate"
+    streamlit run app.py --server.port $DEFAULT_UI_PORT --server.address 0.0.0.0 &
+    UI_PID=$!
+    cd deployment
+    sleep 5
     
-    # Start Streamlit
-    echo "📊 Starting Streamlit dashboard on port $STREAMLIT_PORT..."
-    echo ""
-    echo "🎉 QuantumLogic Platform is starting!"
-    echo "======================================================="
-    echo "📊 Streamlit Dashboard: http://localhost:$STREAMLIT_PORT"
-    echo "🚀 FastAPI Documentation: http://localhost:$API_PORT/docs"
-    echo "🏥 API Health Check: http://localhost:$API_PORT/health"
-    echo ""
-    echo "💡 Press Ctrl+C to stop all services"
-    echo ""
+    if kill -0 $UI_PID 2>/dev/null; then
+        print_success "Streamlit UI started (PID: $UI_PID)"
+        return 0
+    else
+        print_error "Failed to start Streamlit UI"
+        return 1
+    fi
+}
+
+start_docker() {
+    echo "🐳 Starting with Docker Compose..."
     
-    # Function to cleanup on exit
-    cleanup() {
-        echo ""
-        echo "🧹 Shutting down services..."
+    if ! command -v docker &> /dev/null; then
+        print_error "Docker is required but not installed"
+        exit 1
+    fi
+    
+    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+        print_error "Docker Compose is required but not installed"
+        exit 1
+    fi
+    
+    # Use docker compose if available, fallback to docker-compose
+    if docker compose version &> /dev/null; then
+        docker compose up --build
+    else
+        docker-compose up --build
+    fi
+}
+
+show_usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  --docker     Start using Docker Compose (recommended)"
+    echo "  --local      Start using local Python environment"
+    echo "  --help       Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0 --docker     # Start complete platform with Docker"
+    echo "  $0 --local      # Start with local Python setup"
+    echo "  $0              # Interactive mode"
+}
+
+cleanup() {
+    echo ""
+    echo "🛑 Shutting down..."
+    
+    if [ ! -z "$API_PID" ]; then
         kill $API_PID 2>/dev/null || true
-        echo "✅ Cleanup complete!"
-        exit 0
-    }
+        print_success "FastAPI backend stopped"
+    fi
     
-    # Set trap for cleanup
-    trap cleanup SIGINT SIGTERM
+    if [ ! -z "$UI_PID" ]; then
+        kill $UI_PID 2>/dev/null || true
+        print_success "Streamlit UI stopped"
+    fi
     
-    # Start Streamlit (foreground)
-    streamlit run app.py --server.port $STREAMLIT_PORT --server.headless false
-fi
+    echo "👋 Goodbye!"
+}
+
+# Main execution
+main() {
+    print_header
+    
+    case "${1:-}" in
+        --docker)
+            start_docker
+            ;;
+        --local)
+            check_dependencies
+            check_ports $DEFAULT_API_PORT $DEFAULT_UI_PORT || exit 1
+            setup_venv
+            
+            trap cleanup EXIT
+            
+            start_api || exit 1
+            start_ui || exit 1
+            
+            echo ""
+            print_success "🚀 QLCT Platform is running!"
+            echo ""
+            echo "📍 Access Points:"
+            echo "   🌐 Landing Page:    http://localhost:$DEFAULT_API_PORT"
+            echo "   📊 Dashboard:       http://localhost:$DEFAULT_UI_PORT"
+            echo "   📖 API Docs:        http://localhost:$DEFAULT_API_PORT/docs"
+            echo "   ❤️  Health Check:   http://localhost:$DEFAULT_API_PORT/health"
+            echo ""
+            echo "Press Ctrl+C to stop all services"
+            
+            wait
+            ;;
+        --help)
+            show_usage
+            ;;
+        *)
+            echo "🚀 QuantumLogic Chip Technology Startup"
+            echo ""
+            echo "How would you like to start the platform?"
+            echo ""
+            echo "1) Docker Compose (recommended)"
+            echo "2) Local Python environment"
+            echo "3) Show help"
+            echo ""
+            read -p "Choose an option [1-3]: " choice
+            
+            case $choice in
+                1)
+                    start_docker
+                    ;;
+                2)
+                    main --local
+                    ;;
+                3)
+                    show_usage
+                    ;;
+                *)
+                    print_error "Invalid option. Use --help for usage information."
+                    exit 1
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+# Run main function with all arguments
+main "$@"
