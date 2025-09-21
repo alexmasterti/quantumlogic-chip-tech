@@ -38,6 +38,12 @@ Thumbs.db
 # Documentation build
 docs/_build/
 
+# Documentation and presentations (not needed in containers)
+presentations/
+documentation/
+demos/
+temp/
+
 # Package builds
 build/
 dist/

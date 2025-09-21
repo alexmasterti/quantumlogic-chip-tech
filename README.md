@@ -1,32 +1,52 @@
-# QuantumLogic Chip Technology v3
+# 🚀 QuantumLogic Chip Technology (QLCT)
 
-Research prototype for the NIW endeavor by Alex Costa Souza. 
-This version includes quantum algorithms (Grover + Amplitude Estimation), FastAPI service, Streamlit UI, Docker containerization, and automated CI/CD.
+**Production-Ready Quantum Computing & Post-Quantum Cryptography Platform**  
+*Research prototype for NIW endeavor by Alex Costa Souza*
 
-## 🚀 Quick Start with Docker (Recommended)
+This platform demonstrates advanced quantum algorithms, enterprise-grade software architecture, and production-ready deployment capabilities.
 
-The fastest way to run the complete system:
+## 📁 **Project Structure**
 
-```bash
-# Option 1: Automated startup script (RECOMMENDED)
-./start.sh --docker
-
-# Option 2: Manual Docker commands
-docker compose up --build
-
-# Run in background  
-docker compose up -d --build
+```
+quantumlogic-chip-tech/
+├── 📊 presentations/          # Presentation materials & pitch decks
+├── 📚 documentation/          # Technical documentation & guides  
+├── 🎮 demos/                  # Demo scripts & examples
+├── 🐳 deployment/             # Docker & deployment configuration
+├── 📦 src/qlct/               # Core quantum algorithms & services
+├── 🧪 tests/                  # Test suite
+├── 📁 static/                 # Assets & logo files
+├── 🗂️ temp/                   # Temporary files
+├── app.py                     # Main Streamlit application
+├── requirements.txt           # Python dependencies
+└── pyproject.toml            # Project configuration
 ```
 
-Then open:
-- **Streamlit UI**: http://localhost:8501
-- **FastAPI API**: http://localhost:8000/docs
-- **API Health**: http://localhost:8000/health
+## 🚀 **Quick Start**
 
-## 🛠️ Local Development Setup
+### **One-Command Deployment**
+```bash
+# Navigate to deployment folder
+cd deployment
+
+# Start the complete platform
+docker compose up --build
+
+# Or use the automated script
+./start.sh --docker
+```
+
+### **Access Points**
+- **🌐 Landing Page:** http://localhost:8000
+- **📊 Interactive Dashboard:** http://localhost:8503
+- **📖 API Documentation:** http://localhost:8000/docs
+- **❤️ Health Check:** http://localhost:8000/health
+
+## 🛠️ **Local Development Setup**
 
 ```bash
 # Option 1: Automated startup script (RECOMMENDED)
+cd deployment
 ./start.sh
 
 # Option 2: Manual setup
