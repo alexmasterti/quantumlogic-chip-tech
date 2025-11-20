@@ -79,7 +79,7 @@ with st.sidebar:
             st.image(logo_path_alt, width=200)
         else:
             st.markdown("🔬 **QUANTUM LOGIC**")
-    st.image("https://img.icons8.com/fluency/96/quantum-technology.png", width=80)
+    st.image("https://img.icons8.com/fluency/96/structure.png", width=80)
     st.title("🔧 Configuration")
     
     # Get API URL from centralized config
