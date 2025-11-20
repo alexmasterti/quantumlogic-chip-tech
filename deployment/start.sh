@@ -45,7 +45,7 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v pip &> /dev/null; then
+    if ! python3 -m pip --version &> /dev/null; then
         print_error "pip is required but not installed"
         exit 1
     fi

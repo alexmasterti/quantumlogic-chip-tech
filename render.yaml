@@ -1,0 +1,28 @@
+services:
+  # FastAPI Backend
+  - type: web
+    name: qlct-api
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: deployment/Dockerfile.api
+    envVars:
+      - key: PYTHONPATH
+        value: /app/src
+    healthCheckPath: /health
+    plan: free
+
+  # Streamlit UI
+  - type: web
+    name: qlct-ui
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: deployment/Dockerfile.streamlit
+    envVars:
+      - key: QLCT_API_URL
+        fromService:
+          type: web
+          name: qlct-api
+          property: url
+      - key: PYTHONPATH
+        value: /app/src
+    plan: free
