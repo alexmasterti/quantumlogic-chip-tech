@@ -87,23 +87,31 @@ with st.sidebar:
     # Smart API URL detection with multiple fallbacks
     def get_default_api_url():
         """Detect the correct API URL with fallbacks"""
-        # Check environment variable first
+        # 1. Check environment variable (Render/Cloud)
         env_api_url = os.getenv('QLCT_API_URL')
         if env_api_url:
             if not env_api_url.startswith("http"):
                 return f"http://{env_api_url}"
             return env_api_url
             
-        # Try common API ports in order of preference
+        # 2. Check if running in Docker (internal networking)
+        # If we can resolve 'qlct-api', we are likely in Docker
+        try:
+            import socket
+            socket.gethostbyname('qlct-api')
+            return "http://qlct-api:8000"
+        except:
+            pass
+
+        # 3. Try common local ports
         api_candidates = [
             "http://127.0.0.1:8000",  # Standard FastAPI port
             "http://localhost:8000",   # Alternative localhost
-            "http://0.0.0.0:8000",    # Docker/network binding
         ]
         
         for candidate in api_candidates:
             try:
-                response = requests.get(f"{candidate}/health", timeout=2)
+                response = requests.get(f"{candidate}/health", timeout=1)
                 if response.status_code == 200:
                     return candidate
             except:
@@ -116,7 +124,7 @@ with st.sidebar:
     default_api_url = get_default_api_url()
     
     api = st.text_input("API Base URL", default_api_url, 
-                       help="FastAPI backend URL (auto-detected). Set QLCT_API_URL environment variable to override.")
+                       help="FastAPI backend URL. Auto-detected based on environment (Local/Docker/Cloud).")
     
     # Enhanced connection test
     col1, col2 = st.columns([1, 1])
@@ -125,24 +133,31 @@ with st.sidebar:
             try:
                 with st.spinner("Testing API connection..."):
                     response = requests.get(f"{api}/health", timeout=5)
+                    
                     if response.status_code == 200:
-                        st.success("✅ API Connected!")
-                        health_data = response.json()
-                        st.json(health_data)
-                        
-                        # Show additional API info
-                        if "quantum_backend_status" in health_data:
-                            st.info(f"🔬 Quantum Backend: {health_data['quantum_backend_status']}")
-                        if "crypto_backend_status" in health_data:
-                            st.info(f"🔐 Crypto Backend: {health_data['crypto_backend_status']}")
+                        try:
+                            health_data = response.json()
+                            st.success("✅ API Connected!")
+                            st.json(health_data)
+                            
+                            # Show additional API info
+                            if "quantum_backend_status" in health_data:
+                                st.info(f"🔬 Quantum Backend: {health_data['quantum_backend_status']}")
+                            if "crypto_backend_status" in health_data:
+                                st.info(f"🔐 Crypto Backend: {health_data['crypto_backend_status']}")
+                        except json.JSONDecodeError:
+                            st.warning("⚠️ API Connected (200 OK) but returned invalid JSON.")
+                            st.code(response.text[:500], language="html")
+                            st.error("This usually means the URL is pointing to a web page instead of the API endpoint.")
                     else:
                         st.error(f"❌ API Error: {response.status_code}")
+                        st.text(response.text[:200])
             except requests.exceptions.ConnectionError:
                 st.error(f"❌ Connection Failed: Cannot reach {api}")
                 st.warning("💡 **Troubleshooting:**")
-                st.warning("1. Make sure FastAPI server is running: `uvicorn qlct.pipeline.fastapi_app:app --reload --port 8000`")
-                st.warning("2. Check if Docker is running: `docker compose up --build`")
-                st.warning("3. Verify the API URL is correct")
+                st.warning("1. **Local**: Check if `uvicorn` is running on port 8000.")
+                st.warning("2. **Docker**: Ensure `qlct-api` service is healthy.")
+                st.warning("3. **Render**: Check if the API service has finished deploying.")
             except Exception as e:
                 st.error(f"❌ Error: {str(e)}")
                 
