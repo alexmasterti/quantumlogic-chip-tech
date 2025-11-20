@@ -14,11 +14,16 @@ def get_api_url() -> str:
        - Default: http://127.0.0.1:8000
     """
     # 1. Environment Variable (Cloud / Production)
+    # 1. Environment Variable (Cloud / Production)
     env_api_url = os.getenv('QLCT_API_URL')
     if env_api_url:
-        # Handle Render internal URL format (host:port)
+        # FIX: Render Free Tier often fails to resolve internal DNS (qlct-api:10000).
+        # If we detect the internal URL, force the Public URL which we know works.
+        if "qlct-api" in env_api_url and "10000" in env_api_url:
+            return "https://qlct-api.onrender.com"
+            
+        # Handle other formats
         if not env_api_url.startswith("http"):
-            # If it looks like a domain or internal host
             if "://" not in env_api_url:
                 return f"http://{env_api_url}"
             return env_api_url
