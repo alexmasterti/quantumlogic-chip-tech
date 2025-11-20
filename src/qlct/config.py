@@ -16,9 +16,13 @@ def get_api_url() -> str:
     # 1. Environment Variable (Cloud / Production)
     env_api_url = os.getenv('QLCT_API_URL')
     if env_api_url:
-        # Ensure it starts with http/https
+        # Handle Render internal URL format (host:port)
         if not env_api_url.startswith("http"):
-            return f"https://{env_api_url}" # Default to https for cloud
+            # If it looks like a domain or internal host
+            if "://" not in env_api_url:
+                return f"http://{env_api_url}"
+            return env_api_url
+            
         return env_api_url
         
     # 2. Local Development Fallback
