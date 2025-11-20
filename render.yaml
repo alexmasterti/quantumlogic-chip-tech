@@ -22,7 +22,7 @@ services:
         fromService:
           type: web
           name: qlct-api
-          property: url
+          property: hostport
       - key: PYTHONPATH
         value: /app/src
     plan: free

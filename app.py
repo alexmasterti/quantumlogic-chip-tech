@@ -90,6 +90,8 @@ with st.sidebar:
         # Check environment variable first
         env_api_url = os.getenv('QLCT_API_URL')
         if env_api_url:
+            if not env_api_url.startswith("http"):
+                return f"http://{env_api_url}"
             return env_api_url
             
         # Try common API ports in order of preference
