@@ -67,3 +67,6 @@ Thumbs.db
 
 # Ignore python virtualenv site-packages accidentally
 site-packages/
+venv/
+__pycache__/
+*.pyc
