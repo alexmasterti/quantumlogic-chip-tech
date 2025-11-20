@@ -8,6 +8,7 @@ import pandas as pd
 from datetime import datetime
 import time
 import os
+from qlct.config import get_api_url
 
 # Page configuration
 st.set_page_config(
@@ -78,68 +79,14 @@ with st.sidebar:
             st.image(logo_path_alt, width=200)
         else:
             st.markdown("🔬 **QUANTUM LOGIC**")
-            st.markdown("**CHIP TECHNOLOGY**")
+    st.image("https://img.icons8.com/fluency/96/quantum-technology.png", width=80)
+    st.title("🔧 Configuration")
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown("### 🔧 Configuration")
-    
-    # Smart API URL detection with multiple fallbacks
-    def get_default_api_url():
-        """Detect the correct API URL with fallbacks"""
-        # 1. Check environment variable (Render/Cloud)
-        env_api_url = os.getenv('QLCT_API_URL')
-        if env_api_url:
-            # Ensure schema
-            if not env_api_url.startswith("http"):
-                final_url = f"http://{env_api_url}"
-            else:
-                final_url = env_api_url
-            
-            # Validate DNS immediately
-            try:
-                from urllib.parse import urlparse
-                import socket
-                hostname = urlparse(final_url).hostname
-                socket.gethostbyname(hostname)
-                return final_url
-            except Exception as e:
-                st.sidebar.warning(f"⚠️ Internal API address '{final_url}' is not reachable (DNS Error).")
-                st.sidebar.info("💡 Please paste the **Public API URL** from your Render Dashboard below.")
-                return "" # Return empty to force manual input
-            
-        # 2. Check if running in Docker on Render (internal networking)
-        try:
-            import socket
-            socket.gethostbyname('qlct-api')
-            # If we can resolve the name, we are inside the internal network
-            # Try port 10000 (Render default) first, then 8000 (Docker default)
-            return "http://qlct-api:10000"
-        except:
-            pass
-
-        # 3. Try common local ports (Local Development)
-        api_candidates = [
-            "http://127.0.0.1:8000",  # Standard FastAPI port
-            "http://localhost:8000",   # Alternative localhost
-        ]
-        
-        for candidate in api_candidates:
-            try:
-                response = requests.get(f"{candidate}/health", timeout=1)
-                if response.status_code == 200:
-                    return candidate
-            except:
-                continue
-                
-        # Default fallback
-        return "http://127.0.0.1:8000"
-    
-    # Get smart default
-    default_api_url = get_default_api_url()
+    # Get API URL from centralized config
+    default_api_url = get_api_url()
     
     api = st.text_input("API Base URL", default_api_url, 
-                       help="Enter the URL of your deployed API (e.g., https://qlct-api-xxxx.onrender.com)")
+                       help="FastAPI backend URL. Auto-detected from environment.")
     
     # Enhanced connection test
     col1, col2 = st.columns([1, 1])
