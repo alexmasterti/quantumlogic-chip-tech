@@ -7,8 +7,10 @@ import os
 
 def test_api():
     # Start the API server in background
+    # Start the API server in background
     print("Starting API server...")
-    proc = subprocess.Popen(['uvicorn', 'qlct.pipeline.fastapi_app:app', '--host', '0.0.0.0', '--port', '8000'])
+    # Use sys.executable to ensure we use the same python environment
+    proc = subprocess.Popen([sys.executable, '-m', 'uvicorn', 'qlct.pipeline.fastapi_app:app', '--host', '0.0.0.0', '--port', '8000'])
     # Poll for server health
     print("Waiting for server to start...")
     base_url = 'http://localhost:8000'
