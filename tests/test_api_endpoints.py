@@ -9,20 +9,34 @@ def test_api():
     # Start the API server in background
     print("Starting API server...")
     proc = subprocess.Popen(['uvicorn', 'qlct.pipeline.fastapi_app:app', '--host', '0.0.0.0', '--port', '8000'])
-    time.sleep(5)  # Wait for server to start
+    # Poll for server health
+    print("Waiting for server to start...")
+    base_url = 'http://localhost:8000'
+    server_ready = False
+    
+    for i in range(30):  # Try for 30 seconds
+        try:
+            with httpx.Client(base_url=base_url, timeout=2.0) as client:
+                response = client.get('/health')
+                if response.status_code == 200:
+                    print("Server is ready!")
+                    server_ready = True
+                    break
+        except:
+            time.sleep(1)
+            
+    if not server_ready:
+        print("Server failed to start in time")
+        proc.terminate()
+        sys.exit(1)
 
     try:
         # Test endpoints
-        base_url = 'http://localhost:8000'
         print(f"Testing endpoints at {base_url}")
         
         with httpx.Client(base_url=base_url, timeout=10.0) as client:
-            # Check health first
+            # Check health first (already done but good for consistency)
             response = client.get('/health')
-            print(f"Health check: {response.status_code}")
-            if response.status_code != 200:
-                print(f"Health check failed: {response.text}")
-                sys.exit(1)
 
             # Test score endpoint
             print("Testing /score...")
