@@ -88,22 +88,25 @@ with st.sidebar:
     def get_default_api_url():
         """Detect the correct API URL with fallbacks"""
         # 1. Check environment variable (Render/Cloud)
+        # This is the most reliable method if set in render.yaml
         env_api_url = os.getenv('QLCT_API_URL')
         if env_api_url:
             if not env_api_url.startswith("http"):
                 return f"http://{env_api_url}"
             return env_api_url
             
-        # 2. Check if running in Docker (internal networking)
-        # If we can resolve 'qlct-api', we are likely in Docker
+        # 2. Check if running in Docker on Render (internal networking)
+        # Render services typically listen on port 10000 internally
         try:
             import socket
             socket.gethostbyname('qlct-api')
-            return "http://qlct-api:8000"
+            # If we can resolve the name, we are inside the internal network
+            # Try port 10000 (Render default) first, then 8000 (Docker default)
+            return "http://qlct-api:10000"
         except:
             pass
 
-        # 3. Try common local ports
+        # 3. Try common local ports (Local Development)
         api_candidates = [
             "http://127.0.0.1:8000",  # Standard FastAPI port
             "http://localhost:8000",   # Alternative localhost
