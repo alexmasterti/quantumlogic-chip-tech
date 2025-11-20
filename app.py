@@ -69,17 +69,16 @@ with st.sidebar:
     st.markdown('<div class="sidebar-logo">', unsafe_allow_html=True)
     
     # Logo placeholder - replace with actual logo path
-    logo_path = "static/qlct_logo.png"
-    if os.path.exists(logo_path):
-        st.image(logo_path, width=200)
+    # Logo logic: User Preference -> Generated Backup -> Text Fallback
+    logo_primary = "static/QuantumLogic_logo_Black.png"
+    logo_backup = "static/qlct_logo.png"
+    
+    if os.path.exists(logo_primary):
+        st.image(logo_primary, width=200)
+    elif os.path.exists(logo_backup):
+        st.image(logo_backup, width=200)
     else:
-        # Fallback: Check if it's in the root directory
-        logo_path_alt = "qlct_logo.png"
-        if os.path.exists(logo_path_alt):
-            st.image(logo_path_alt, width=200)
-        else:
-            st.markdown("🔬 **QUANTUM LOGIC**")
-    st.image("https://img.icons8.com/fluency/96/structure.png", width=80)
+        st.markdown("🔬 **QUANTUM LOGIC**")
     st.title("🔧 Configuration")
     
     # Get API URL from centralized config
