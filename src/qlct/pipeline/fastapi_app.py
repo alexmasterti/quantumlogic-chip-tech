@@ -422,7 +422,7 @@ async def amplitude_estimation(request: AmplitudeRequest):
         raise HTTPException(status_code=500, detail="Amplitude estimation failed")
 
 @app.post("/protect", tags=["Cryptography"])
-async def protect_payload(request: ProtectRequest):
+async def protect_payload_endpoint(request: ProtectRequest):
     """
     Encrypt payload using post-quantum cryptography
     
@@ -447,7 +447,7 @@ async def protect_payload(request: ProtectRequest):
         raise HTTPException(status_code=500, detail="Encryption failed")
 
 @app.post("/restore", tags=["Cryptography"])
-async def restore_payload(request: RestoreRequest):
+async def restore_payload_endpoint(request: RestoreRequest):
     """
     Decrypt payload using provided key
     
